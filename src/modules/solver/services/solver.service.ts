@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, GatewayTimeoutException, Injectable } from '@nestjs/common';
 import { PuzzleDto } from '../dtos/puzzleDto';
 import { SteinAlgorithm } from '../algorithms/stein.algorithm';
 
@@ -25,11 +25,12 @@ export class SolverService {
                 });
         }
 
-        const solution = this.solvePuzzle(puzzle.x_capacity, puzzle.y_capacity, puzzle.z_amount_wanted);
+        const timeout = 5000;
+        const solution = this.solvePuzzle(puzzle.x_capacity, puzzle.y_capacity, puzzle.z_amount_wanted, timeout, Date.now());
         return { solution };
     }
 
-    solvePuzzle(X: number, Y: number, Z: number): { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] {
+    solvePuzzle(X: number, Y: number, Z: number, timeout: number, startTime: number): { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] {
         // Initialize arrays to track the optimal solution
         const solution: { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] = [];
         let step = 0;
@@ -44,6 +45,14 @@ export class SolverService {
         }];
 
         while (queue.length > 0 && !found) {
+            if (Date.now() - startTime > timeout) {
+                throw new GatewayTimeoutException("Timeout",
+                    {
+                        cause: new Error(),
+                        description: `The algorithm took too long to find a solution.`
+                    });
+            }
+
             const { bucketX, bucketY, actions } = queue.shift() as { bucketX: number, bucketY: number, actions: { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] };
 
             visited.add(`${bucketX},${bucketY}`);
