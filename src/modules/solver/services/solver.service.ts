@@ -1,5 +1,6 @@
 import { BadRequestException, GatewayTimeoutException, Inject, Injectable } from '@nestjs/common';
 import { PuzzleDto } from '../dtos/puzzleDto';
+import { ActionDto } from '../dtos/actionDto';
 import { SteinAlgorithm } from '../algorithms/stein.algorithm';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
@@ -44,15 +45,15 @@ export class SolverService {
         return { solution };
     }
 
-    solvePuzzle(X: number, Y: number, Z: number, timeout: number, startTime: number): { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] {
+    solvePuzzle(X: number, Y: number, Z: number, timeout: number, startTime: number): ActionDto[] {
         // Initialize arrays to track the optimal solution
-        const solution: { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] = [];
+        const solution: ActionDto[] = [];
         let step = 0;
 
         // Perform BFS to find the optimal solution
         let found = false;
         let visited: Set<string> = new Set();
-        let queue: { bucketX: number, bucketY: number, actions: { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] }[] = [{
+        let queue: { bucketX: number, bucketY: number, actions: ActionDto[] }[] = [{
             bucketX: 0,
             bucketY: 0,
             actions: []
@@ -67,7 +68,7 @@ export class SolverService {
                     });
             }
 
-            const { bucketX, bucketY, actions } = queue.shift() as { bucketX: number, bucketY: number, actions: { step: number, bucketX: number, bucketY: number, action: string, status?: string }[] };
+            const { bucketX, bucketY, actions } = queue.shift() as { bucketX: number, bucketY: number, actions: ActionDto[] };
 
             visited.add(`${bucketX},${bucketY}`);
 
