@@ -2,7 +2,7 @@
 <h1 align="center" style="font-weight: bold;">Water Jug Puzzle 💻</h1>
 
 
-<p align="center">This an API REST that solves the water jug puzzle developed with NestJS and TypesScript</p>
+<p align="center">This is an API REST that solves the water jug puzzle implementing the Stein's Algorithm and the Breadth First Search graph traversal algorithm. Developed with NestJS and TypesScript</p>
 
 
  
